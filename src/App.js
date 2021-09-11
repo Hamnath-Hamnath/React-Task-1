@@ -7,6 +7,8 @@ function App() {
   const [search, setSearch] = useState("");
   const [completed, setCompleted] = useState(0);
   const [notCompleted, setNotCompleted] = useState(0);
+  const [title, setTitle] = useState("");
+  const [searchResult, setSearchResult] = useState(post);
 
   useEffect(() => {
     axios
@@ -14,36 +16,41 @@ function App() {
       .then((res) => {
         setPost(res.data);
         // console.log("Data Recieved ==>", post);
+        setCompleted(post.filter((item) => item.completed === true).length);
+        setNotCompleted(post.filter((item) => item.completed === false).length);
       })
       .catch((err) => {
         console.log("Error occured while fetching");
       });
-    setCompleted(post.filter((item) => item.completed === true).length);
-    setNotCompleted(post.filter((item) => item.completed === false).length);
   }, []);
 
   useEffect(() => {
-    const SearchResult = post.filter((title) =>
-      title.toLowerCase().includes(search)
-    );
-    setPost(SearchResult);
-  }, [search]);
-
-  const handleChange = (event) => {
-    setSearch(event.target.value);
+    if (title !== "") {
+      const result = post.filter((data) => {
+        return data.title.toLowerCase().startsWith(title.toLowerCase());
+      });
+      setSearchResult(result);
+    } else {
+      setSearchResult(post);
+    }
+  }, [title]);
+  const filter = (e) => {
+    const keyword = e.target.value;
+    setTitle(keyword);
   };
   return (
     <>
-      <div className="container mt-5">
+      <div className="container my-5">
         <div>
           <input
             type="search"
             placeholder="Search"
-            value={search}
-            onChange={handleChange}
+            className="form-control"
+            value={title}
+            onChange={filter}
           />
         </div>
-        <div className="row">
+        <div className="row mt-2">
           <div className="col-6 text-success"> Completed - {completed}</div>
           <div className="col-6 text-danger">
             Not Completed - {notCompleted}
@@ -64,20 +71,35 @@ function App() {
             </tr>
           </thead>
           <tbody>
-            {post.map((data, index) => (
-              <tr key={data.id}>
-                <td>{index + 1}</td>
-                <td>{data.userId}</td>
-                <td>{data.title}</td>
-                <td>
-                  {data.completed === true ? (
-                    <div className="p-3 bg-success"></div>
-                  ) : (
-                    <div className="p-3 bg-danger"></div>
-                  )}
-                </td>
-              </tr>
-            ))}
+            {searchResult && searchResult.length > 0
+              ? searchResult.map((data, index) => (
+                  <tr key={data.id}>
+                    <td>{index + 1}</td>
+                    <td>{data.userId}</td>
+                    <td>{data.title}</td>
+                    <td>
+                      {data.completed === true ? (
+                        <div className="p-3 bg-success"></div>
+                      ) : (
+                        <div className="p-3 bg-danger"></div>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              : post.map((data, index) => (
+                  <tr key={data.id}>
+                    <td>{index + 1}</td>
+                    <td>{data.userId}</td>
+                    <td>{data.title}</td>
+                    <td>
+                      {data.completed === true ? (
+                        <div className="p-3 bg-success"></div>
+                      ) : (
+                        <div className="p-3 bg-danger"></div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
           </tbody>
         </table>
       </div>
