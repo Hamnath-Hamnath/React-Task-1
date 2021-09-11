@@ -16,8 +16,10 @@ function App() {
       .then((res) => {
         setPost(res.data);
         // console.log("Data Recieved ==>", post);
-        setCompleted(post.filter((item) => item.completed === true).length);
-        setNotCompleted(post.filter((item) => item.completed === false).length);
+        setCompleted(res.data.filter((item) => item.completed === true).length);
+        setNotCompleted(
+          res.data.filter((item) => item.completed === false).length
+        );
       })
       .catch((err) => {
         console.log("Error occured while fetching");
