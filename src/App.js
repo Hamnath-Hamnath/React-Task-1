@@ -1,10 +1,10 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
+import Title from "./Title";
 
 function App() {
   const [post, setPost] = useState([]);
-  const [search, setSearch] = useState("");
   const [completed, setCompleted] = useState(0);
   const [notCompleted, setNotCompleted] = useState(0);
   const [title, setTitle] = useState("");
@@ -25,8 +25,9 @@ function App() {
         console.log("Error occured while fetching");
       });
   }, []);
-
-  useEffect(() => {
+  const filter = (e) => {
+    const keyword = e.target.value;
+    setTitle(keyword);
     if (title !== "") {
       const result = post.filter((data) => {
         return data.title.toLowerCase().startsWith(title.toLowerCase());
@@ -35,10 +36,6 @@ function App() {
     } else {
       setSearchResult(post);
     }
-  }, [title]);
-  const filter = (e) => {
-    const keyword = e.target.value;
-    setTitle(keyword);
   };
   return (
     <>
@@ -75,33 +72,9 @@ function App() {
           <tbody>
             {searchResult && searchResult.length > 0
               ? searchResult.map((data, index) => (
-                  <tr key={data.id}>
-                    <td>{index + 1}</td>
-                    <td>{data.userId}</td>
-                    <td>{data.title}</td>
-                    <td>
-                      {data.completed === true ? (
-                        <div className="p-3 bg-success"></div>
-                      ) : (
-                        <div className="p-3 bg-danger"></div>
-                      )}
-                    </td>
-                  </tr>
+                  <Title data={data} index={index} />
                 ))
-              : post.map((data, index) => (
-                  <tr key={data.id}>
-                    <td>{index + 1}</td>
-                    <td>{data.userId}</td>
-                    <td>{data.title}</td>
-                    <td>
-                      {data.completed === true ? (
-                        <div className="p-3 bg-success"></div>
-                      ) : (
-                        <div className="p-3 bg-danger"></div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+              : post.map((data, index) => <Title data={data} index={index} />)}
           </tbody>
         </table>
       </div>
